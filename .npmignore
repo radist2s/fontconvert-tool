@@ -1,4 +1,4 @@
 .idea
 .gitignore
-node_modules
 test/dest
+lib/font-utils/forge-scripts-unused

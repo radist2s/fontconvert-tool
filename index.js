@@ -4,18 +4,29 @@ var async = require('async'),
     fontUtils = require('./lib/font-utils'),
     util = require('util')
 
-exports.outTypes = ['eot', 'woff', 'woff2']
+exports.outTypes = ['ttf', 'eot', 'woff', 'woff2']
 exports.log = console.log.bind(console)
+exports.sourceFontTypes = ['sfd', 'ttf', 'otf', 'ps', 'sfnt', 'bdf', 'fon', 'fnt', 'svg', 'ufo']
 
 exports.defaultConfig = {
     autoHint: true,
     subset: false,
     outTypes: null,
-    woff2NativeConverter: false
+    woff2NativeConverter: true,
+    ttfautoHintFallbackScript: 'latn',
+    ttfautoHintArgs: [],
+    fontFileNameFilter: null,
+    fontDestinationDirFilter: null
 }
 
-exports.createFontName = function createFontName(fontName) {
-    return fontName.replace(/\s+/g, '-').replace(/[-_]+/g, '-').toLowerCase()
+exports.createFontFileName = function createFontFileName(fontFamily, config) {
+    var fontFileName = fontFamily.replace(/\s+/g, '-').replace(/[-_]+/g, '-').toLowerCase()
+
+    if (config && config.fontFileNameFilter instanceof Function) {
+        fontFileName = config.fontFileNameFilter(fontFileName, fontFamily, config)
+    }
+
+    return fontFileName
 }
 
 exports.convertFont = function convertFont(sourceFontPath, config, callback) {
@@ -44,8 +55,13 @@ exports.convertFont = function convertFont(sourceFontPath, config, callback) {
                 })
             },
             function (fall) {
-                fontDestName = exports.createFontName(fontFamily)
+                fontDestName = exports.createFontFileName(fontFamily, config)
                 fontDestDir =  path.resolve(path.join(destinationDir, fontDestName))
+
+                if (config && config.fontDestinationDirFilter instanceof Function) {
+                    fontDestDir = config.fontDestinationDirFilter(fontDestDir, destinationDir, fontDestName, fontFamily, config)
+                }
+
                 normalizedFontPath = path.join(fontDestDir, fontDestName + '.ttf')
 
                 try {
@@ -76,7 +92,7 @@ exports.convertFont = function convertFont(sourceFontPath, config, callback) {
                     return fall(null)
                 }
 
-                fontUtils.autoHint(normalizedFontPath, normalizedFontPath, fall)
+                fontUtils.autoHint(normalizedFontPath, normalizedFontPath, config, fall)
 
                 exports.log(fontFamilyLogging, 'hinted')
             },
@@ -111,6 +127,9 @@ exports.convertFont = function convertFont(sourceFontPath, config, callback) {
 
                         nextEach(null)
                     }
+                    else if (type === 'ttf') {
+                        nextEach(null) // ttf was converted previously
+                    }
                     else {
                         fontUtils.convert(normalizedFontPath, convertedFontPath, nextEach)
                     }
@@ -124,12 +143,24 @@ exports.convertFont = function convertFont(sourceFontPath, config, callback) {
 exports.getSourceFontsPath = function (sourceFontsDir, callback) {
     var fonts = []
 
+    var sourceFontTypes = exports.sourceFontTypes
+
     fs.readdir(sourceFontsDir, function (error, files) {
         if (error) {
             return callback(error)
         }
 
         async.eachSeries(files, function (fontFile, nextEach) {
+            if (sourceFontTypes instanceof Array && sourceFontTypes.length) {
+                var fontSupported = sourceFontTypes.some(function (type) {
+                    return new RegExp('\.' + type + '$', 'i').test(fontFile)
+                })
+
+                if (!fontSupported) {
+                    return nextEach()
+                }
+            }
+
             var sourceFont = path.join(sourceFontsDir, fontFile)
 
             if (!fs.statSync(sourceFont).isFile()) {
@@ -146,6 +177,12 @@ exports.getSourceFontsPath = function (sourceFontsDir, callback) {
 }
 
 exports.convertFonts = function convertFonts(sourceFontsDir, destinationDir, callback, config) {
+    if (config instanceof Function) {
+        var _callback = config
+        config = callback
+        callback = _callback
+    }
+
     config = config || {}
 
     config.sourceFontsDir = sourceFontsDir
