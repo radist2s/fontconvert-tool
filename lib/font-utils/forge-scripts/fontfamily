@@ -1,0 +1,6 @@
+Open($1);
+#Print(GetTTFName(0x409, 2)); ## Styles (SubFamily) exmp: Italic
+#Print(GetTTFName(0x409, 16)); ## Preferred Family exmp: Ford Antenna
+#Print(GetTTFName(0x409, 17)); ## Preferred Styles exmp: Thin italic
+Print($fullname);
+Quit(0);

@@ -1,0 +1,15 @@
+Open($1);
+
+%unicode_assignments%
+
+#Select(0u0000)      # null
+SelectMore(0x000D)  # nonmarkingreturn
+SelectMore(0x0020)  # space
+
+%selections%
+
+SelectInvert();
+Clear();
+
+# Option 4 - for generating a short 'post' table with no glyph name info in it. Need for better Mac rendering.
+Generate($2, "", 4);
