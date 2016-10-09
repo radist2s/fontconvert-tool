@@ -2,11 +2,33 @@ var async = require('async'),
     fs = require('fs'),
     path = require('path'),
     fontUtils = require('./lib/font-utils'),
-    util = require('util')
+    util = require('util'),
+    _ = require('lodash')
 
 exports.outTypes = ['ttf', 'eot', 'woff', 'woff2']
 exports.log = console.log.bind(console)
 exports.sourceFontTypes = ['sfd', 'ttf', 'otf', 'ps', 'sfnt', 'bdf', 'fon', 'fnt', 'svg', 'ufo']
+
+Object.defineProperty(exports, 'fontForgeBin',
+    {
+        get: function () {
+            return fontUtils.fontForgeBin
+        },
+        set: function (binPath) {
+            fontUtils.fontForgeBin = binPath
+        }
+    }
+)
+Object.defineProperty(exports, 'ttfautohintBin',
+    {
+        get: function () {
+            return fontUtils.fontForgeBin
+        },
+        set: function (binPath) {
+            fontUtils.fontForgeBin = binPath
+        }
+    }
+)
 
 exports.defaultConfig = {
     autoHint: true,
@@ -188,31 +210,36 @@ exports.convertFonts = function convertFonts(sourceFontsDir, destinationDir, cal
     config.sourceFontsDir = sourceFontsDir
     config.destinationDir = destinationDir
 
-    var _config = util._extend({}, exports.defaultConfig)
-    config = util._extend(_config, config)
+    var _config = _.extend({}, exports.defaultConfig)
+    config = _.extend(_config, config)
 
     if (!config.outTypes) {
         config.outTypes = exports.outTypes
     }
 
-    async.waterfall(
-        [
-            function (fall) {
-                exports.getSourceFontsPath(sourceFontsDir, fall)
-            },
-            function(fonts, fall) {
-                async.eachSeries(fonts, function (sourceFontPath, nextEach) {
-                    async.waterfall(
-                        [
-                            function (fall) {
-                                exports.convertFont(sourceFontPath, config, fall)
-                            }
-                        ],
-                        nextEach
-                    )
-                }, fall)
+    return new Promise(function (resolve, reject) {
+        async.waterfall(
+            [
+                function (fall) {
+                    exports.getSourceFontsPath(sourceFontsDir, fall)
+                },
+                function(fonts, fall) {
+                    async.eachSeries(fonts, function (sourceFontPath, nextEach) {
+                        async.waterfall(
+                            [
+                                function (fall) {
+                                    exports.convertFont(sourceFontPath, config, fall)
+                                }
+                            ],
+                            nextEach
+                        )
+                    }, fall)
+                }
+            ],
+            function (error) {
+                (error ? reject : resolve).apply(undefined, arguments)
+                callback.apply(undefined, arguments)
             }
-        ],
-        callback
-    )
+        )
+    })
 }
