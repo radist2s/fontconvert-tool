@@ -65,12 +65,13 @@ exports.convertFont = function convertFont(sourceFontPath, config, callback) {
             function (fall) {
                 fontUtils.fontFamily(sourceFontPath, function (_fontFamily) {
                     fontFamily = _fontFamily
-                    fontFamilyLogging = '"' + fontFamily + '"'
-
+                    
                     if (!fontFamily) {
-                        return fall(path.basename(sourceFontPath) + ' has no family name')
+                        fontFamily = path.basename(sourceFontPath, path.extname(sourceFontPath)).toLowerCase().replace(/[-_\s]+/g, '-')
                     }
 
+                    fontFamilyLogging = '"' + fontFamily + '"'
+                    
                     exports.log('Converting', fontFamilyLogging)
 
                     fall(null)
@@ -78,7 +79,7 @@ exports.convertFont = function convertFont(sourceFontPath, config, callback) {
             },
             function (fall) {
                 fontDestName = exports.createFontFileName(fontFamily, config)
-                fontDestDir =  path.resolve(path.join(destinationDir, fontDestName))
+                fontDestDir = path.resolve(path.join(destinationDir, fontDestName))
 
                 if (config && config.fontDestinationDirFilter instanceof Function) {
                     fontDestDir = config.fontDestinationDirFilter(fontDestDir, destinationDir, fontDestName, fontFamily, config)
@@ -89,7 +90,7 @@ exports.convertFont = function convertFont(sourceFontPath, config, callback) {
                 try {
                     fs.mkdirSync(fontDestDir)
                 }
-                catch(e) {
+                catch (e) {
                     if (e.code !== 'EEXIST') {
                         return fall('Can`t create dir ' + fontDestDir)
                     }
@@ -223,7 +224,7 @@ exports.convertFonts = function convertFonts(sourceFontsDir, destinationDir, cal
                 function (fall) {
                     exports.getSourceFontsPath(sourceFontsDir, fall)
                 },
-                function(fonts, fall) {
+                function (fonts, fall) {
                     async.eachSeries(fonts, function (sourceFontPath, nextEach) {
                         async.waterfall(
                             [
