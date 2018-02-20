@@ -16,6 +16,8 @@ var subset = [
 
 describe('Convert', function() {
     it('should convert all files', function (done) {
+        this.timeout(20000)
+        
         var config = {
             subset: subset,
             outTypes: outTypes
@@ -40,6 +42,8 @@ describe('Convert', function() {
     })
 
     it('should apply filters', function (done) {
+        this.timeout(20000)
+        
         var dirCounter = 0,
             fileCounter = 0
 

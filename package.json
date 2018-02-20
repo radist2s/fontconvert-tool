@@ -1,10 +1,10 @@
 {
   "name": "fontconvert-tool",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "WebFonts generation tool",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "keywords": [
     "fontface",
@@ -22,7 +22,7 @@
     "lodash": ">=4.0.0"
   },
   "devDependencies": {
-    "mocha": ">=2.2.5"
+    "mocha": "^5.0.1"
   },
   "directories": {
     "test": "test"

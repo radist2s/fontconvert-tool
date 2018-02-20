@@ -21,14 +21,40 @@ SetOS2Value("TypoDescentIsOffset", 0);
 SetOS2Value("HHeadAscentIsOffset", 0);
 SetOS2Value("HHeadDescentIsOffset", 0);
 
-wa = GetOS2Value('WinAscent');
-wd = GetOS2Value('WinDescent');
+HHeadAscent = GetOS2Value('HHeadAscent')
+HHeadDescent = -GetOS2Value('HHeadDescent')
+WinAscent = GetOS2Value('WinAscent')
+WinDescent = GetOS2Value('WinDescent')
+
+if (WinAscent < HHeadAscent)
+    Ascent = WinAscent
+else
+    Ascent = HHeadAscent
+endif
+
+if (WinDescent < HHeadDescent)
+    Descent = WinDescent
+else
+    Descent = HHeadDescent
+endif
+
+capHeight = GetOS2Value('capHeight')
+
+AscentFreeSpace = Ascent - capHeight
+
+if (Descent < AscentFreeSpace)
+    Descent = AscentFreeSpace 
+else 
+    Ascent = capHeight + Descent
+endif
 
 # Ascent and Desc
-SetOS2Value('TypoAscent', wa);
-SetOS2Value('TypoDescent', wd);
-SetOS2Value('HHeadAscent', wa);
-SetOS2Value('HHeadDescent', -wd);
+SetOS2Value('WinAscent', Ascent);
+SetOS2Value('WinDescent', Descent);
+SetOS2Value('TypoAscent', Ascent);
+SetOS2Value('TypoDescent', -Descent);
+SetOS2Value('HHeadAscent', Ascent);
+SetOS2Value('HHeadDescent', -Descent);
 
 # Line Gap
 SetOS2Value('TypoLineGap', 0);
