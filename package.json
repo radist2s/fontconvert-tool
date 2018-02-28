@@ -1,6 +1,6 @@
 {
   "name": "fontconvert-tool",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "WebFonts generation tool",
   "main": "index.js",
   "scripts": {

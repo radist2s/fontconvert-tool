@@ -63,7 +63,7 @@ fontconvert.convertFonts('./fonts-source', './fonts-out', {
 
 ## API
 
-### fontconvert(fontsInputDir, fontsOutDir, [config, callback])
+##### fontconvert.convertFonts(fontsInputDir, fontsOutDir, [config, callback])
 
 Returns a promise.
 

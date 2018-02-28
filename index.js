@@ -239,7 +239,10 @@ exports.convertFonts = function convertFonts(sourceFontsDir, destinationDir, cal
             ],
             function (error) {
                 (error ? reject : resolve).apply(undefined, arguments)
-                callback.apply(undefined, arguments)
+                
+                if (callback instanceof Function) {
+                    callback.apply(undefined, arguments)       
+                }
             }
         )
     })
