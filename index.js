@@ -140,6 +140,7 @@ exports.convertFont = function convertFont(sourceFontPath, config, callback) {
           config.subset,
           normalizedFontPath,
           normalizedFontPath,
+          fontTempDir,
           fall
         )
 
