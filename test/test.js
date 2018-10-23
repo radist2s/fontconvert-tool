@@ -10,14 +10,36 @@ var outTypes = ['ttf', 'eot', 'woff', 'woff2']
 
 var subset = [
     'Basic Latin', 'Latin-1 Supplement',
-    'Cyrillic Russian',
-    'General Punctuation', 'Currency Symbols'
+    'General Punctuation', 'Currency Symbols',
+    [
+        'French',
+        [
+            [
+                '0x00C0', '0x0E0',
+                '0x00C2', '0x0E2',
+                '0x00C6', '0x0E6',
+                '0x00C8', '0x0E8',
+                '0x00C9', '0x0E9',
+                '0x00CA', '0x0EA',
+                '0x00CB', '0x0EB',
+                '0x00CE', '0x0EE',
+                '0x00CF', '0x0EF',
+                '0x00D4', '0x0F4',
+                '0x0152', '0x0153',
+                '0x00D9', '0x0F9',
+                '0x00DB', '0x0FB',
+                '0x00DC', '0x0FC',
+                '0x0178', '0x0FF',
+                '0x00C7', '0x0E7'
+            ]
+        ]
+    ]
 ]
 
-describe('Convert', function() {
+describe('Convert', function () {
     it('should convert all files', function (done) {
         this.timeout(20000)
-        
+
         var config = {
             subset: subset,
             outTypes: outTypes
@@ -43,7 +65,7 @@ describe('Convert', function() {
 
     it('should apply filters', function (done) {
         this.timeout(20000)
-        
+
         var dirCounter = 0,
             fileCounter = 0
 
